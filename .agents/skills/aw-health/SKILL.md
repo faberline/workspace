@@ -31,14 +31,16 @@ user asks whether a project is healthy, production-ready, blocked, or why
 
 ## Command
 
-`aw health` emits JSON by default and owns the readiness gate. Do not add
-`--human` or `--pretty` unless the user asks for a human-readable report.
+`aw health` emits the agent-facing readiness envelope by default and owns the
+readiness gate. Do not add `--json`; it is a deprecated compatibility no-op.
+Use `--human` or `--pretty` only when the user asks for a human-readable or
+debug-formatted report.
 
 ```bash
 aw health <project>
 ```
 
-Use the JSON envelope as authoritative:
+Use the stdout envelope as authoritative:
 
 - `completion.workflow_complete=true` and `readiness.production_ready=true`:
   report ready.
