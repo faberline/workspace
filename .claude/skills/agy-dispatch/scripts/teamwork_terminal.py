@@ -13,8 +13,10 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-
-TEMP_ROOT = Path("/tmp").resolve()
+from agy_dispatch import (
+    load_profile as load_dispatch_profile,
+    worktree_scope_report,
+)
 
 
 def agy_help() -> str:
@@ -89,16 +91,14 @@ def require_environment() -> None:
 
 
 def load_profile(path: str) -> dict:
-    profile = json.loads(Path(path).read_text())
-    for key in ("root", "state_dir", "agy_project_id"):
-        if key not in profile:
-            raise SystemExit(f"profile missing {key}")
-    if not Path(profile["root"]).is_dir():
-        raise SystemExit(f"root is not a directory: {profile['root']}")
-    state_dir = Path(profile["state_dir"]).resolve()
-    if state_dir != TEMP_ROOT and not state_dir.is_relative_to(TEMP_ROOT):
-        raise SystemExit("state_dir must be under /tmp/agy-dispatch")
-    profile["state_dir"] = str(state_dir)
+    profile = load_dispatch_profile(path, validate_design=False)
+    scope = worktree_scope_report(profile)
+    if not scope["dispatch_ready"]:
+        raise SystemExit(
+            "interactive teamwork requires the same registered nested "
+            "in-Project task-worktree binding as headless dispatch: "
+            + "; ".join(scope["blockers"])
+        )
     return profile
 
 
@@ -131,7 +131,7 @@ log_file -a {tcl_quote(str(launch_log))}
 set fh [open $prompt_file r]
 set prompt [read $fh]
 close $fh
-spawn -noecho {tcl_quote(agy)} --project {tcl_quote(profile["agy_project_id"])} --prompt-interactive --model {tcl_quote(profile.get("model", "gemini-3.6-flash-high"))} --effort high
+spawn -noecho {tcl_quote(agy)} --project {tcl_quote(profile["agy_project_id"])} --prompt-interactive --model {tcl_quote(profile["model"])} --effort high
 after 2000
 send -- "$prompt\\r"
 interact
