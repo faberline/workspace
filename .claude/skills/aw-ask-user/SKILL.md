@@ -1,83 +1,41 @@
 ---
-name: aw:ask-user
-description: Turn every question the current session has left unasked — a stated assumption, a route it picked between two on its own, an `Open:` line in a document it read past, a decision it deferred with "can be reversed later" — into AskUserQuestion rounds, and hand the answers back as a decision table. Use when a session has been deciding on the human's behalf and the human wants those decisions put to them. Asks only; writes nothing.
-version: 0.1.0
-user-invocable: true
+name: aw-ask-user
+description: Surface every unresolved product or workflow decision that the current session has been making implicitly, ask the human for each answer, and return one decision table. Read-only; it does not edit files or tracker state.
 ---
 
-# /aw-ask-user
+# AW Ask User
 
-Ask the human what the session has been answering for them. This skill owns
-exactly one thing: finding every question that is pending in the current
-context and putting each one to the human through **AskUserQuestion**. It
-writes no file, edits no tracker, and applies no answer — the session that
-invoked it does that, with the answers in hand.
+## Goal
 
-The two grills — `/aw-grill-me-to-meta` and `/aw-grill-meta-to-wis` —
-interview against a fixed schema: a section set a script prints, or a
-document's fixed parts. This skill is for the questions that have no schema:
-the ones a session raised, or should have raised, while doing something else,
-and then settled by itself.
+Turn assumptions, silently selected routes, deferred choices, and unresolved
+`Open:` items into explicit human decisions.
 
-## What counts as a pending question
+## How
 
-Walk the current context — the conversation, and any plan file, staged
-work-item body, or product document it names — and collect every place where
-one of these holds:
+1. Review the current conversation and the files already read in this session.
+2. Collect only decisions that can change scope, behavior, order, version, or
+   acceptance. Do not ask for facts that can be read safely.
+3. Group dependent questions together. Ask no more than three short questions
+   in one round.
+4. Use the runtime's native question interface when it is available. Otherwise
+   ask one concise plain-text question and wait.
+5. Give two or three mutually exclusive choices when the real options are
+   known. Put the recommended choice first and state its effect.
+6. Continue until every collected decision has an answer or the human declines
+   to decide it.
+7. Return a table with `Decision`, `Answer`, and `Effect`.
 
-| Source | What it looks like |
-|---|---|
-| A stated assumption | "I assume", "assuming", "defaulting to", "I'll take X to mean" — a value the session supplied so it could continue |
-| A reversible decision | "can be reversed", "可翻", "待拍板", a `(Recommended)` the human never picked, a table of decisions the session made in the human's place |
-| A route chosen alone | two or more approaches were named and the session took one without the human saying which |
-| An `Open:` line | a `- Open:` bullet in a `docs/product/` section, or a question left in an HTML comment of a staged body, that no later text settles |
-| An interrupted interview | a grill whose remaining sections were never asked because the session stopped, was redirected, or the context was summarised |
-| A question answered with a plan | the human asked something and the session replied with what it would do instead of an answer |
+## Acceptance
 
-An optional argument narrows the walk to one topic — a file, a work item, a
-word — and everything outside it is left alone.
-
-Then drop every candidate the context already answers. A question the human
-settled three messages ago is not pending; asking it again is the failure
-this skill exists to prevent, not a safety margin.
-
-## How to ask
-
-1. List the candidates first, in the order they arose, each with where it
-   came from, so the human sees the whole set before answering any of it.
-2. Ask with **AskUserQuestion**, in rounds of at most four questions. Give
-   each question 2-4 concrete options drawn from the repository or the
-   context — the actual paths, commands, names, and values in play — never
-   generic placeholders. Where the session had a preference, that option goes
-   first and is labelled `(Recommended)`; the human can always answer
-   "Other".
-3. Ask in dependency order: a question whose answer decides whether another
-   question exists goes in an earlier round.
-4. Stop when the candidate list is empty. Never invent a question to fill a
-   round.
-
-## Hand back
-
-Print one table and nothing else:
-
-```
-| # | Question | Answer | Applies to |
-|---|---|---|---|
-```
-
-`Applies to` names the file, work item, plan step, or section the answer
-changes. The session applies it; this skill does not.
+- Every material decision found in the session appears in the table.
+- Each answer is the human's answer. No answer is inferred from silence.
+- The skill reports declined or deferred decisions as unresolved.
+- No file, Git ref, issue, milestone, or release changes.
 
 ## Never
 
-This addresses the agent running the round, not the human answering it.
-
-- Never answer a question yourself, and never treat the option the session
-  preferred as the answer because the human did not object to it earlier.
-  Silence is not an answer.
-- Never ask what the context already answers.
-- Never write a file, stage a body, run a tracker verb, or edit a document.
-  The table is the whole output.
-- Never widen the round past the questions that are actually pending. A
-  round padded with questions the session could answer from the repository
-  spends the human's attention on nothing.
+- Never turn a readable fact into a question.
+- Never choose a version, milestone order, scope boundary, or acceptance gate
+  for the human.
+- Never continue a write workflow while a material decision remains unresolved.
+- Never edit the artifact that contains the question.
