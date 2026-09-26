@@ -21,6 +21,7 @@ disagree about which checkout is being measured.
 from __future__ import annotations
 
 import importlib.util
+import os
 import pathlib
 import subprocess
 import sys
@@ -200,11 +201,15 @@ PROCEDURAL = ("e2e-for", "impl-for", "review", "test-for", "product-deliver")
 #
 # That directory moved on 2026-09-02 from `.claude/aw/scripts/` into the
 # `apps/aw` uv project, where each script is also a typer subcommand group of
-# the `aw` entry point (`uv run --project apps/aw aw <group> ...`). The
+# the `aw` entry point (`aw <group> ...`). The
 # `__file__`-relative loading above moved with them unchanged, and every
 # script still runs standalone by path -- which is how the gates here spawn
 # them.
-SCRIPTS = REPO / "apps/aw/src/aw/scripts"
+# aw moved again when the monorepo split: it is its own repository
+# (faberline/aw), measured in the checkout FABERLINE_AW names, else the clone
+# next to this one.
+AW_REPO = pathlib.Path(os.environ.get("FABERLINE_AW") or REPO.parent / "aw")
+SCRIPTS = AW_REPO / "src/aw/scripts"
 SCRIPT = SCRIPTS / "epic.py"
 CHANGE_SCRIPT = SCRIPTS / "change.py"
 LEG_SCRIPT = SCRIPTS / "leg.py"
@@ -306,7 +311,7 @@ def pinned_interpreter() -> list[str]:
 HERE = pathlib.Path(__file__).resolve().parent
 SNAPSHOTS = HERE / "_snapshots"
 
-TRACKER_REPO = "chrischeng-c4/axiom"
+TRACKER_REPO = "faberline/workspace"
 
 
 def load_script_module(path, name):

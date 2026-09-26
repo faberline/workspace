@@ -220,8 +220,8 @@ than version:
 
 | line | tag | produced by | audience |
 |------|-----|-------------|----------|
-| release | `ghcr.io/chrischeng-c4/<app>:<semver>` + `latest` | `<app>-release.yml` | integrators |
-| dev/test | `ghcr.io/chrischeng-c4/<app>:sha-<git12>` | `<app>-test-image.yml` | this harness only |
+| release | `ghcr.io/faberline/<app>:<semver>` + `latest` | `<app>-release.yml` | integrators |
+| dev/test | `ghcr.io/faberline/<app>:sha-<git12>` | `<app>-test-image.yml` | this harness only |
 
 Dispatch `tape-test-image` (Actions → `tape-test-image` → *Run workflow*,
 optionally naming a `ref`) and it builds both musl legs from that commit and
@@ -231,7 +231,7 @@ already pinned by digest; feed that to `TAPE_IMAGE` verbatim:
 ```bash
 PROJECT_ID=axiom-502607 \
 ACCEPTANCE_APPS=tape \
-TAPE_IMAGE=ghcr.io/chrischeng-c4/tape:sha-<git12>@sha256:<digest> \
+TAPE_IMAGE=ghcr.io/faberline/tape:sha-<git12>@sha256:<digest> \
 acceptance/gcp/scripts/run.sh
 ```
 

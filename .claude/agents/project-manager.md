@@ -32,16 +32,16 @@ and return the version the engine computed with it.
   2. `<project>/README.md` `## Capabilities` and its gate table, and
      `<project>/STATUS.md` `## Support matrix`: what already ships and which
      command proves it.
-  3. `uv run --project apps/aw aw wis gap <project>`: G1 lists the promises
+  3. `aw wis gap <project>`: G1 lists the promises
      no release Milestone owns; G3 lists a promise bound to a Milestone that
      cannot carry it. A promise absent from G1 already has a Milestone —
      report it instead of drafting a second one.
-  4. `uv run --project apps/aw aw milestone versions --project <project> --json`
-     and `uv run --project apps/aw aw milestone next-version <project> --json`:
+  4. `aw milestone versions --project <project> --json`
+     and `aw milestone next-version <project> --json`:
      the default is the engine's minor bump; record the JSON verbatim.
   5. Any `type:spike` decision the parent cites (`gh issue view <iid>`): its
      `## Decision` bounds what this release may promise.
-- Draft from `uv run --project apps/aw aw milestone skeleton`:
+- Draft from `aw milestone skeleton`:
   - `## Goal`: one observable outcome for this version, the promise's
     `Outcome:` narrowed to what this release ships, in one sentence.
   - `## Development Order`: keep the skeleton's `Pending:` line byte-for-byte;
@@ -55,7 +55,7 @@ and return the version the engine computed with it.
 - Write the file, then validate it:
 
   ```bash
-  uv run --project apps/aw aw milestone validate --description-file <path> --title <project>@<version> --draft --json
+  aw milestone validate --description-file <path> --title <project>@<version> --draft --json
   ```
 
   Fix the draft until the result is clean.

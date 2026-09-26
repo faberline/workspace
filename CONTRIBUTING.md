@@ -276,7 +276,7 @@ anti-boilerplate check rejected only seven literals (`(fill)`,
 was accepted by construction.
 
 That generator is deleted with the crate that held it. `aw change skeleton`
-(`uv run --project apps/aw aw ...`) emits the empty GHAN template in its
+(`aw ...`) emits the empty GHAN template in its
 place and `aw change validate` is what refuses a body now. The numbers above still describe the tracker,
 though — those bodies were written under the old generator and nothing has
 rewritten them.
@@ -1898,7 +1898,7 @@ tag is never the first artifact. The required chain is `build-release
    pinned image, signature, provenance, SBOM attestations, final manifest).
 4. **verify**: the project's `verify-release-candidate.sh --mode full` re-proves
    the bundle independently of the workflow's own verdict.
-5. **GKE gate**: the candidate image `ghcr.io/chrischeng-c4/<project>@<digest>`
+5. **GKE gate**: the candidate image `ghcr.io/faberline/<project>@<digest>`
    is deployed and verified on GKE by the project's harness, and the evidence
    is bound into `<project>-gke-receipt.json` plus its `.sha256` sidecar.
 6. **promote**: `scripts/release/promote.sh` creates the one annotated

@@ -62,20 +62,28 @@ code, out, err = run(REPO, "bodydir")
 check("off-tree script resolves the checkout from cwd", code == 0, f"exit={code} err={err[:120]}")
 check("and it resolves to THIS checkout", out == expected_bodydir, f"got={out!r}")
 
-# The outermost marker wins, not the nearest. This checkout carries one
-# `aw.toml` per project under apps/ and libs/, and only the repository root's
-# holds the tracker configuration; taking the nearest would stage bodies under
-# apps/<name>/.aw/ and read a config with no tracker in it.
+# The outermost marker wins, not the nearest. A checkout may carry an
+# `aw.toml` per nested project while only the repository root's holds the
+# tracker configuration; taking the nearest would stage bodies under
+# apps/<name>/.aw/ and read a config with no tracker in it. The monorepo
+# measured this on its own apps/; no split checkout nests projects, so the
+# shape is staged: one checkout whose nested project has its own marker.
 #
 # Which project is used matters only in that it must have its own `aw.toml`:
 # without one there is no nearer marker to prefer, and the assertion passes for
 # the wrong reason. So that is checked rather than assumed.
-NESTED = REPO / "apps/preview"
+TREE = STAGE / "projects"
+NESTED = TREE / "apps/demo"
+NESTED.mkdir(parents=True, exist_ok=True)
+for tree in (TREE, NESTED):
+    (tree / "aw.toml").write_text("[agentic_workflow]\n", encoding="utf-8")
+subprocess.run(["git", "init", "-q", str(TREE)], check=True, capture_output=True)
 check("positive control: the nested project has its own `aw.toml`",
       (NESTED / "aw.toml").is_file(), str(NESTED / "aw.toml"))
 
 code, out, err = run(NESTED, "bodydir")
-check("also from a subdirectory of the checkout", code == 0 and out == expected_bodydir,
+check("also from a subdirectory of the checkout",
+      code == 0 and out == str(TREE.resolve() / ".aw/workitems/epics"),
       f"exit={code} got={out!r}")
 
 # The failure has to stay loud: an off-tree script run from an off-tree cwd

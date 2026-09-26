@@ -54,7 +54,7 @@ def main() -> int:
     frozen_iids = [row["iid"] for row in frozen_rows]
     check(
         "versioned cutover manifest loads with exact rows and numeric order",
-        frozen.get("repository") == "chrischeng-c4/axiom"
+        frozen.get("repository") == "faberline/workspace"
         and bool(frozen_rows)
         and frozen_iids == sorted(frozen_iids, key=int),
     )

@@ -8,8 +8,8 @@
 # --app parameterized twins in this directory. Every function prints one
 # value per line and refuses an app it does not know, so a typo cannot fall
 # through to an empty target list.
-RELEASE_REPO="chrischeng-c4/axiom"
-RELEASE_IMAGE_OWNER="ghcr.io/chrischeng-c4"
+RELEASE_REPO="faberline/workspace"
+RELEASE_IMAGE_OWNER="ghcr.io/faberline"
 RELEASE_COMPATIBILITY_LINE="- Compatibility: no HTTP, CLI, wire format, on-disk format, or Kubernetes manifest shape changed in this release."
 
 release_refuse() { printf 'refused: %s\n' "$*" >&2; exit 2; }

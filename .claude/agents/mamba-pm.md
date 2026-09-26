@@ -68,8 +68,8 @@ section instead of writing it.
 - Run the checks and fix until both are clean:
 
   ```bash
-  uv run --project apps/aw aw metadoc check mamba
-  uv run --project apps/aw aw meta check --path apps/mamba
+  aw metadoc check mamba
+  aw meta check --path apps/mamba
   ```
 
 - Report: `git -c core.fsmonitor=false status --short -- apps/mamba`; each

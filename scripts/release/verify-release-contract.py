@@ -52,8 +52,8 @@ BUILD_RELEASE_SH = ROOT / "scripts" / "build" / "release.sh"
 AGENTS_SKILL = ROOT / ".agents" / "skills" / "build-release" / "SKILL.md"
 CLAUDE_SKILL = ROOT / ".claude" / "skills" / "build-release" / "SKILL.md"
 
-REPO = "chrischeng-c4/axiom"
-IMAGE_OWNER = "ghcr.io/chrischeng-c4"
+REPO = "faberline/workspace"
+IMAGE_OWNER = "ghcr.io/faberline"
 GKE_HARNESS_APPS = ("keep", "defer", "relay", "loom")
 ACCEPTANCE_JOB = "deploy + verify on GKE"
 VERIFY_IMAGE_STEP = "Verify prebuilt image input"

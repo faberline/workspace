@@ -34,7 +34,7 @@ Per-app facts, read from `scripts/release/apps.sh` rather than from memory:
 |---|---|---|---|---|
 | tape | `apps/tape` | `apps/tape/scripts/verify-release-{candidate,artifacts}.sh` | `acceptance/gcp/scripts/run.sh` with `ACCEPTANCE_APPS=tape` and `TAPE_IMAGE=<candidate root digest reference>` | `apps/tape/scripts/make-gke-release-receipt.py` from the run's `run.json`, `images.json`, `acceptance.json`, `cleanup.json` |
 | sift | `projects/sift` | `scripts/release/verify-release-{candidate,artifacts}.sh --app sift` | `acceptance/gcp/scripts/run.sh` with `ACCEPTANCE_APPS="lumen sift"`, `LUMEN_IMAGE=<current lumen release digest reference>`, `SIFT_IMAGE=<candidate root digest reference>` | `scripts/release/make-gke-release-receipt.py --app sift --backend gcp` |
-| keep, relay, defer | `apps/<app>` | `scripts/release/verify-release-{candidate,artifacts}.sh --app <app>` | `scripts/build/release.sh <app> --image ghcr.io/chrischeng-c4/<app>@sha256:<root digest>`, with `main` checked out at the candidate's exact commit (the receipt binds the run's head sha to the candidate) | `scripts/release/make-gke-release-receipt.py --app <app> --backend gke-acceptance` from the `gh run view --json …` record its `--help` names and the downloaded evidence bundle |
+| keep, relay, defer | `apps/<app>` | `scripts/release/verify-release-{candidate,artifacts}.sh --app <app>` | `scripts/build/release.sh <app> --image ghcr.io/faberline/<app>@sha256:<root digest>`, with `main` checked out at the candidate's exact commit (the receipt binds the run's head sha to the candidate) | `scripts/release/make-gke-release-receipt.py --app <app> --backend gke-acceptance` from the `gh run view --json …` record its `--help` names and the downloaded evidence bundle |
 
 ## Required order
 
@@ -58,7 +58,7 @@ and 7 with `run_in_background` and poll their output.
    It must bind every candidate job conclusion (the job set
    `scripts/release/apps.sh` lists for the app), the dispatched sha, the
    version, the run id and attempt, every archive, and the digest-pinned
-   image `ghcr.io/chrischeng-c4/<app>@sha256:<root digest>`; the driver
+   image `ghcr.io/faberline/<app>@sha256:<root digest>`; the driver
    exits `1` when it does not.
 4. Independently run the candidate verifier in full mode. Stop on any mismatch.
    The verifier is the app's `verify-release-candidate.sh --mode full`
@@ -68,7 +68,7 @@ and 7 with `run_in_background` and poll their output.
    the acceptance; the workflow's own green is not.
 5. Run the app's GKE gate against the candidate image (per-app table
    above). It is paid, and the human triggers it. Deploy only
-   `ghcr.io/chrischeng-c4/<app>@sha256:<root digest>` from the manifest,
+   `ghcr.io/faberline/<app>@sha256:<root digest>` from the manifest,
    never a rebuilt or retagged image. Keep the evidence the gate leaves
    behind: `run.json`, `images.json`, `acceptance.json`, and
    `cleanup.json` for tape and sift; the `gke-acceptance` run record and

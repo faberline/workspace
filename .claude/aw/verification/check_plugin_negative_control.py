@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -20,7 +21,8 @@ SKILLS = (
 )
 
 
-SCRIPTS_REL = Path("apps/aw/src/aw/scripts")
+AW = Path(os.environ.get("FABERLINE_AW") or REPO.parent / "aw")
+SCRIPTS_REL = Path("src/aw/scripts")
 
 
 def fixture(root: Path) -> None:
@@ -31,9 +33,9 @@ def fixture(root: Path) -> None:
             shutil.copytree(REPO / runtime / "skills" / skill, target)
     (root / ".claude").mkdir(exist_ok=True)
     shutil.copy2(REPO / ".claude" / "settings.json", root / ".claude" / "settings.json")
-    scripts = root / SCRIPTS_REL
+    scripts = root.parent / "aw" / SCRIPTS_REL
     scripts.mkdir(parents=True)
-    for source in (REPO / SCRIPTS_REL).glob("*.py"):
+    for source in (AW / SCRIPTS_REL).glob("*.py"):
         shutil.copy2(source, scripts / source.name)
 
 
@@ -41,13 +43,14 @@ def run(root: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         (sys.executable, str(CHECKER), "--repo", str(root)),
         capture_output=True,
+        env={**os.environ, "FABERLINE_AW": str(root.parent / "aw")},
         text=True,
     )
 
 
 def case(name: str, mutate, expected: str) -> bool:
     with tempfile.TemporaryDirectory(prefix="aw-plugin-control-") as raw:
-        root = Path(raw)
+        root = Path(raw) / "workspace"
         fixture(root)
         baseline = run(root)
         if baseline.returncode != 0:
@@ -81,14 +84,14 @@ def restore_issue_epic(root: Path) -> None:
 
 
 def remove_next_verb(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/milestone.py"
+    path = root.parent / "aw/src/aw/scripts/milestone.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace('sub.add_parser("next")', 'sub.add_parser("queue")', 1)
     path.write_text(text, encoding="utf-8")
 
 
 def change_default_milestone_bump(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/milestone.py"
+    path = root.parent / "aw/src/aw/scripts/milestone.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace('DEFAULT_BUMP = "minor"', 'DEFAULT_BUMP = "patch"', 1)
     path.write_text(text, encoding="utf-8")
@@ -146,14 +149,14 @@ def drift_shortcut_mirror(root: Path) -> None:
 
 
 def bypass_plan_digest(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/release_plan.py"
+    path = root.parent / "aw/src/aw/scripts/release_plan.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace("if sha != args.approved_digest:", "if False:", 1)
     path.write_text(text, encoding="utf-8")
 
 
 def change_release_plan_schema(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/release_plan.py"
+    path = root.parent / "aw/src/aw/scripts/release_plan.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace('SCHEMA = "release-plan-v1"',
                         'SCHEMA = "release-plan-v2"', 1)
@@ -161,7 +164,7 @@ def change_release_plan_schema(root: Path) -> None:
 
 
 def conditionally_reassign_release_plan_schema(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/release_plan.py"
+    path = root.parent / "aw/src/aw/scripts/release_plan.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace(
         'SCHEMA = "release-plan-v1"',
@@ -172,7 +175,7 @@ def conditionally_reassign_release_plan_schema(root: Path) -> None:
 
 
 def erase_behavior_flow(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/wi_types.py"
+    path = root.parent / "aw/src/aw/scripts/wi_types.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace('BEHAVIOR_TYPES = ("feat", "fix", "perf")',
                         "BEHAVIOR_TYPES = ()", 1)
@@ -180,7 +183,7 @@ def erase_behavior_flow(root: Path) -> None:
 
 
 def remove_migration_apply(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/type_migration.py"
+    path = root.parent / "aw/src/aw/scripts/type_migration.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace('mode.add_argument("--apply"',
                         'mode.add_argument("--migrate"', 1)
@@ -188,7 +191,7 @@ def remove_migration_apply(root: Path) -> None:
 
 
 def weaken_maint_record(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/maint.py"
+    path = root.parent / "aw/src/aw/scripts/maint.py"
     text = path.read_text(encoding="utf-8")
     text = text.replace('command.add_argument("--output-file", required=True)',
                         'command.add_argument("--result-file", required=True)', 1)
@@ -196,7 +199,7 @@ def weaken_maint_record(root: Path) -> None:
 
 
 def bypass_lifecycle_close(root: Path) -> None:
-    path = root / "apps/aw/src/aw/scripts/change.py"
+    path = root.parent / "aw/src/aw/scripts/change.py"
     text = path.read_text(encoding="utf-8")
     start = text.index("def cmd_close(args)")
     prefix, close = text[:start], text[start:]

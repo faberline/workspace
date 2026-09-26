@@ -15,7 +15,7 @@ only the approved `aw-grill-release apply` creates it.
 ## Goal
 
 Stage one validated GHAN body per issue the Milestone still needs, at
-`$(uv run --project apps/aw aw change bodydir --type <type>)/<file>`, each
+`$(aw change bodydir --type <type>)/<file>`, each
 passing `aw change validate --type <type> --body-file <path>`, together with
 one proposed queue order, so the grill can create the issues in that order
 without rewriting a body.
@@ -26,9 +26,9 @@ without rewriting a body.
   exact `<project>@<version>` title. Read it:
 
   ```bash
-  uv run --project apps/aw aw milestone show milestone:<number> --json
-  uv run --project apps/aw aw milestone children milestone:<number> --json
-  uv run --project apps/aw aw wis gap <project>
+  aw milestone show milestone:<number> --json
+  aw milestone children milestone:<number> --json
+  aw wis gap <project>
   ```
 
   Issues already assigned are not re-drafted; draft only what `## Goal`
@@ -45,7 +45,7 @@ without rewriting a body.
   table needs two unrelated reds; merge issues whose gates cannot be
   measured apart.
 - Author each body from
-  `uv run --project apps/aw aw change skeleton --type <type>`:
+  `aw change skeleton --type <type>`:
   - `## Goal`: one observable-difference sentence — trigger, observation
     point, current value, target value.
   - `## How`. `### Verified premises`: each with a `path:line` you read,
@@ -69,8 +69,8 @@ without rewriting a body.
 - Stage and validate every body:
 
   ```bash
-  uv run --project apps/aw aw change bodydir --type <type>
-  uv run --project apps/aw aw change validate --type <type> --body-file <path> --json
+  aw change bodydir --type <type>
+  aw change validate --type <type> --body-file <path> --json
   ```
 
   Fix until each result is clean. Name files `<milestone>-<nn>-<slug>.md` so

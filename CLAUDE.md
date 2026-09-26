@@ -1,9 +1,9 @@
 ---
 project:
-  name: axiom
-  owner: chrischeng-c4
-  url: https://github.com/chrischeng-c4/axiom
-  ssh: git@github.com:chrischeng-c4/axiom.git
+  name: workspace
+  owner: faberline
+  url: https://github.com/faberline/workspace
+  ssh: git@github.com:faberline/workspace.git
   default_branch: main
 ---
 
@@ -122,6 +122,6 @@ promote, publish, or close work automatically. A worker report or partial gate
 is not final acceptance. The controller accepts only after independent,
 necessary verification.
 
-`aw` is the Python CLI at `apps/aw`, invoked as
-`uv run --project apps/aw aw <group> …`. It remains available for the explicit
+`aw` is the Python CLI from `faberline/aw`, installed as a uv tool and invoked as
+`aw <group> …`. It remains available for the explicit
 legacy route only.

@@ -351,7 +351,7 @@ The cutover order is fixed:
 5. Run one apply with a durable receipt path:
 
    ```text
-   uv run --python 3.13 --no-project "apps/aw/src/aw/scripts/type_migration.py" --repo chrischeng-c4/axiom --manifest .claude/aw/migrations/open-legacy-types-2026-08-31.json --apply --receipt <durable-receipt.json>
+   uv run --python 3.13 --no-project "apps/aw/src/aw/scripts/type_migration.py" --repo faberline/workspace --manifest .claude/aw/migrations/open-legacy-types-2026-08-31.json --apply --receipt <durable-receipt.json>
    ```
 
 6. If it stops, keep the pause and run only

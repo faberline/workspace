@@ -2,7 +2,7 @@
 # Contract: ~/.claude/skills/dispatch-to-agy/profiles/README.md
 # Sourced by agy-wave.sh. No output, no side effects.
 
-REPO="chrischeng-c4/axiom"
+REPO="faberline/workspace"
 
 # cargo rebuilds the pinned test binary. `lock` denies it globally; without that
 # the global grants file hands out `command(cargo test)` on its own.

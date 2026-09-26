@@ -68,8 +68,8 @@ section instead of writing it.
 - Run the checks and fix until both are clean:
 
   ```bash
-  uv run --project apps/aw aw metadoc check pm
-  uv run --project apps/aw aw meta check --path apps/pm
+  aw metadoc check pm
+  aw meta check --path apps/pm
   ```
 
 - Report: `git -c core.fsmonitor=false status --short -- apps/pm`; each

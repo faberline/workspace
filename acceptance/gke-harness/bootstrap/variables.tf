@@ -16,7 +16,7 @@ variable "region" {
 variable "github_repository" {
   description = "owner/name of the GitHub repository allowed to assume the deployer SA via OIDC."
   type        = string
-  default     = "chrischeng-c4/axiom"
+  default     = "faberline/workspace"
   validation {
     condition     = can(regex("^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$", var.github_repository))
     error_message = "github_repository must be owner/name."

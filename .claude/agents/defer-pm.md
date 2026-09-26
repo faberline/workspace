@@ -68,8 +68,8 @@ section instead of writing it.
 - Run the checks and fix until both are clean:
 
   ```bash
-  uv run --project apps/aw aw metadoc check defer
-  uv run --project apps/aw aw meta check --path apps/defer
+  aw metadoc check defer
+  aw meta check --path apps/defer
   ```
 
 - Report: `git -c core.fsmonitor=false status --short -- apps/defer`; each

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import os
 import re
 from pathlib import Path
 
@@ -52,16 +53,21 @@ FRONTMATTER = re.compile(r"\A---\n(?P<body>.*?)\n---\n", re.S)
 SCRIPT_NAME = re.compile(r"(?<![A-Za-z0-9_/-])([a-z][a-z0-9_-]*\.py)\b")
 GH_WRITE = re.compile(r"\bgh\s+(?:issue|pr)\s+(?:create|edit|close|reopen|delete|comment)\b")
 LEGACY_WRITE = re.compile(r"\b(?:epic\.py|aw epic)\s+(?:create|update|close)\b")
-# The `aw` name is live again: `apps/aw` exposes the engine as typer groups,
-# launched as `uv run --project apps/aw aw <group> ...`. A skill may therefore
+# The `aw` name is live again: faberline/aw exposes the engine as typer groups,
+# launched as `aw <group> ...`. A skill may therefore
 # name `aw <group>` freely — what stays refused is a group outside the typer
 # registry, which is exactly the shape of a retired `aw <verb>` (wi, ec, td...).
 AW_GROUPS = (
     "change", "milestone", "e2e", "impl", "maint",
     "wis", "meta", "metadoc", "release-plan", "version",
 )
-AW_INVOCATION = re.compile(r"(?:`|\buv run --project apps/aw )aw\s+([a-z0-9-]+)")
-LAUNCHER_PREFIX = "uv run --project apps/aw aw "
+AW_INVOCATION = re.compile(r"(?:`|\buv run --project . )aw\s+([a-z0-9-]+)")
+LAUNCHER_PREFIX = "aw "
+
+
+def aw_repo(repo: Path) -> Path:
+    """The aw checkout: FABERLINE_AW, else the clone next to this one."""
+    return Path(os.environ.get("FABERLINE_AW") or repo.parent / "aw")
 
 
 class Reporter:
@@ -124,7 +130,7 @@ def collect(repo: Path) -> Reporter:
     report = Reporter()
     codex_root = repo / ".agents" / "skills"
     claude_root = repo / ".claude" / "skills"
-    scripts_root = repo / "apps" / "aw" / "src" / "aw" / "scripts"
+    scripts_root = aw_repo(repo) / "src" / "aw" / "scripts"
 
     report.check("Codex skill root exists", codex_root.is_dir(), str(codex_root))
     report.check("Claude skill root exists", claude_root.is_dir(), str(claude_root))
@@ -178,7 +184,7 @@ def collect(repo: Path) -> Reporter:
                      if "uv run" in line]
         off_form = [line for line in launchers
                     if LAUNCHER_PREFIX not in line]
-        report.check(f"{skill}: every `uv run` line uses the apps/aw launcher",
+        report.check(f"{skill}: every `uv run` line uses the aw launcher",
                      not off_form, f"off-form={off_form}" if off_form else "")
         report.check(f"{skill}: has no direct GitHub write", not GH_WRITE.search(text))
         # A bare `epic.py` mention is already refused below: the SCRIPT_NAME

@@ -14,7 +14,7 @@
 set -u
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-REPO="${AGY_REPO:-chrischeng-c4/axiom}"
+REPO="${AGY_REPO:-faberline/workspace}"
 ROOT="${AGY_ROOT:-/Users/chrischeng/axiom/project-mamba}"
 # The `-cfbeef43138f9938` suffix is cargo's METADATA hash, not a content hash: it
 # is stable across source edits, so a rebuild overwrites the artifact in place

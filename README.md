@@ -1,104 +1,88 @@
-# axiom
+# workspace
 
-A monorepo of high-performance, Rust-built developer infrastructure. Each
-project below is self-contained and ships its own README — follow the links for
-details.
+Shared tooling for the [faberline](https://github.com/faberline) repositories:
+the agent skills, hooks and dispatch every repository's agents run, the fleet
+templates and their renderer, the git/gh/build/release routes, the metadoc
+contracts, and the cross-repository GCP acceptance harness. It was split out of
+the `faberline/axiom` monorepo with its history; each app now lives in its own
+repository, and the monorepo is archived.
 
-## Projects
+## Repositories
 
-| Project | What it is |
-|---------|------------|
-| [cap](apps/cap/README.md) | `cap` keeps heavy local commands (`cargo test`, `uv run`, `pnpm build`, …) from eating the whole machine. |
-| [vat](apps/vat/README.md) | `vat` is a headless local development test runner for the one operator Docker was never designed for: a coding/ML agent. |
-| [courier](apps/courier/README.md) | `courier` is a stateless, GCP-hosted proxy that centralizes GitHub-issue access for every axiom CLI. |
-| [loom](apps/loom/README.md) | Loom is the workflow scheduler in the Axiom service stack. |
-| [preview](apps/preview/README.md) | `preview` manages MR-scoped UAT preview environments for GKE. |
-| [tape](apps/tape/README.md) | Tape is the topic replay journal in the Axiom service stack. |
-| [defer](apps/defer/README.md) | Defer is the Cloud Tasks-like delayed push-queue dispatch service in the Axiom stack. |
-| [cube](apps/cube/README.md) | Cube is the OLAP service in the Axiom service stack. |
-| [mesh](apps/mesh/README.md) | Mesh is the relationship/property-graph service in the Axiom service stack. |
-| [beam](apps/beam/README.md) | Beam is the GPU vector database in the Axiom service stack. |
-| [workbench](apps/workbench/README.md) | Terminal-first desktop workbench that launches Claude Code, Codex, or AGY through their native CLIs in a real PTY and adds read-only context beside the session — without owning vendor sessions or AW lifecycle state. |
-| [arena](apps/arena/README.md) | N-target competitive comparison runner — fan one workload across targets, ratio + ratchet-gate, one agent-readable JSON report. |
-| [guard](apps/guard/README.md) | Security posture gate for the cclab ecosystem. |
-| [mamba](apps/mamba/README.md) | Force-typed Python compiler. |
-| [sift](apps/sift/README.md) | Sift is the GCP/GKE-first operational event platform in the Axiom stack. |
-| [jet](apps/jet/README.md) | Jet is a Rust-native frontend toolchain. |
-| [relay](apps/relay/README.md) | `relay` is the online single-cast pull work-queue broker in the Axiom stack (RabbitMQ/SQS-shaped): a producer publishes a task, a worker pulls (leases) it, runs it, and acks — each message is delivered exactly once to one of the competing consumers, then reclaimed (delete-on-ack). |
-| [keep](apps/keep/README.md) | Cloud-native, multi-core key-value / claim-check store — the loom/relay data plane and a Redis / Dragonfly replacement. |
-| [pgpool](apps/pgpool/README.md) | `pgpool` is the working app id for Axiom's Kubernetes-native PostgreSQL connection pooler. |
-| [meter](apps/meter/README.md) | Local resource measurement for agent-driven Rust development. |
+| Repository | What it is |
+|------------|------------|
+| [core](https://github.com/faberline/core) | The shared Rust libraries (`crates/<name>`): transport, server runtime, consensus, storage, auth, observability, Kubernetes integration, and the CLI standard commands. Consumers depend on it by git tag. |
+| [arena](https://github.com/faberline/arena) | N-target competitive comparison runner — fan one workload across targets, ratio + ratchet-gate, one agent-readable JSON report. |
+| [aw](https://github.com/faberline/aw) | The AW workflow engine and its Typer CLI. |
+| [beam](https://github.com/faberline/beam) | Beam is the GPU vector database in the service stack. |
+| [cap](https://github.com/faberline/cap) | `cap` keeps heavy local commands (`cargo test`, `uv run`, `pnpm build`, …) from eating the whole machine. |
+| [cgdb](https://github.com/faberline/cgdb) | Cgdb is a local graph database for agentic codebase understanding. |
+| [courier](https://github.com/faberline/courier) | `courier` is a stateless, GCP-hosted proxy that centralizes GitHub-issue access for every CLI. |
+| [cube](https://github.com/faberline/cube) | Cube is the OLAP service in the service stack. |
+| [defer](https://github.com/faberline/defer) | Defer is the Cloud Tasks-like delayed push-queue dispatch service. |
+| [guard](https://github.com/faberline/guard) | Security posture gate. |
+| [jet](https://github.com/faberline/jet) | Jet is a Rust-native frontend toolchain. |
+| [keep](https://github.com/faberline/keep) | Cloud-native, multi-core key-value / claim-check store — the loom/relay data plane and a Redis / Dragonfly replacement. |
+| [loom](https://github.com/faberline/loom) | Loom is the workflow scheduler in the service stack. |
+| [lumen](https://github.com/faberline/lumen) | Lumen is a Kubernetes-native search service. |
+| [mamba](https://github.com/faberline/mamba) | Force-typed Python compiler. |
+| [mesh](https://github.com/faberline/mesh) | Mesh is the relationship/property-graph service in the service stack. |
+| [meter](https://github.com/faberline/meter) | Local resource measurement for agent-driven Rust development. |
+| [pgpool](https://github.com/faberline/pgpool) | Kubernetes-native PostgreSQL connection pooler. |
+| [pm](https://github.com/faberline/pm) | Local, agent-first project management MCP server. |
+| [preview](https://github.com/faberline/preview) | `preview` manages MR-scoped UAT preview environments for GKE. |
+| [relay](https://github.com/faberline/relay) | `relay` is the online single-cast pull work-queue broker (RabbitMQ/SQS-shaped). |
+| [rig](https://github.com/faberline/rig) | Declarative test-scenario and load harness engine. |
+| [sift](https://github.com/faberline/sift) | Sift is the GCP/GKE-first operational event platform. |
+| [tape](https://github.com/faberline/tape) | Tape is the topic replay journal in the service stack. |
+| [vat](https://github.com/faberline/vat) | `vat` is a headless local development test runner for coding/ML agents. |
+| [workbench](https://github.com/faberline/workbench) | Terminal-first desktop workbench that launches Claude Code, Codex, or AGY through their native CLIs in a real PTY. |
 
-This table is hand-maintained. It used to be spliced in from a generator that no
-longer exists, so adding a project under `apps/` adds no row on its own.
+Apps depend on `core` by git tag and on sibling apps by git revision.
 
-## Shared Libraries
+## Working across repositories
 
-Services and tools compose the shared Rust libraries in
-[faberline/core](https://github.com/faberline/core) instead of reimplementing
-transport, auth, metrics, codegen, replication, durable local storage, backup,
-or operator plumbing locally. Each library is a `crates/<name>` package there;
-member manifests here depend on it by git tag (`tag = "v0.4.14"`), and READMEs
-name it `core/<name>`. Run a library's own tests at the pinned commit with
-`bash scripts/faberline-core-test.sh <name>`.
+Clone the repositories you work on side by side:
 
-`lumen` and `rig` moved to [faberline/lumen](https://github.com/faberline/lumen)
-and [faberline/rig](https://github.com/faberline/rig); consumers here pin them
-by git revision.
+```
+~/faberlines/workspace
+~/faberlines/aw
+~/faberlines/<app>
+```
 
-The library naming grammar still applies; see
-[Shared-library naming grammar](CONTRIBUTING.md#shared-library-naming-grammar).
+Install the `aw` CLI with `uv tool install git+https://github.com/faberline/aw`;
+the skills and agent roles run it as `aw <group> …`. The gates under
+`.claude/aw/verification/` measure the aw engine in the checkout that
+`FABERLINE_AW` names, else in `../aw`.
 
-## Install
+## Layout
 
-Each binary ships a `curl | sh` installer that downloads the right prebuilt
-binary from GitHub Releases and drops it on your `PATH` (default
-`$HOME/.local/bin`). Self-update later with `<binary> upgrade`. Projects without
-an installer yet are marked _coming soon_.
+| Path | What it holds |
+|------|---------------|
+| `.agents/`, `.claude/`, `.codex/`, `.gemini/` | Skills, hooks, dispatch, output styles and the rendered agent fleet. Each app repository carries its own `<app>-*` roles. |
+| `.claude/aw/` | The AW verification gates and migrations. |
+| `scripts/agents/` | Fleet templates and `render_fleet.py`. |
+| `scripts/git/`, `scripts/gh/`, `scripts/build/`, `scripts/release/` | Git, GitHub, build and release routes. |
+| `scripts/meta/` | README and project-docs contracts. |
+| `acceptance/` | GKE acceptance harness for the services. |
+| `benchmarks/gcp-managed-services/` | GCP managed-service calibration. |
 
-| Project | Binary | Install |
-|---------|--------|---------|
-| [arena](apps/arena/README.md) | `arena` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/arena/install.sh \| sh` |
-| [cap](apps/cap/README.md) | `cap` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/cap/install.sh \| sh` |
-| [courier](apps/courier/README.md) | `courier` | _coming soon_ |
-| [guard](apps/guard/README.md) | `guard` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/guard/install.sh \| sh` |
-| [jet](apps/jet/README.md) | `jet` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/jet/install.sh \| sh` |
-| [beam](apps/beam/README.md) | `beam` | _coming soon_ |
-| [cube](apps/cube/README.md) | `cube` | _coming soon_ |
-| [defer](apps/defer/README.md) | `defer` | _coming soon_ |
-| [keep](apps/keep/README.md) | `keep` | _coming soon_ |
-| [loom](apps/loom/README.md) | `loom` | _coming soon_ |
-| [mamba](apps/mamba/README.md) | `mamba` | _coming soon_ |
-| [meter](apps/meter/README.md) | `meter` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/meter/install.sh \| sh` |
-| [pgpool](apps/pgpool/README.md) | `pgpool` | _coming soon_ |
-| [preview](apps/preview/README.md) | `preview` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/preview/install.sh \| sh` |
-| [sift](apps/sift/README.md) | `sift` | _coming soon_ |
-| [relay](apps/relay/README.md) | `relay` | _coming soon_ |
-| [tape](apps/tape/README.md) | `tape` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/tape/install.sh \| sh` |
-| [vat](apps/vat/README.md) | `vat` | `curl -fsSL https://raw.githubusercontent.com/chrischeng-c4/axiom/main/apps/vat/install.sh \| sh` |
+## Known gaps after the split
 
-## Runtime Evidence Loop
-
-The runtime tools are intentionally split by responsibility:
-
-- `vat` prepares and runs the local environment.
-- `rig` drives requests, queries, and workload traffic.
-- `meter measure` observes a running executable or service from the outside and
-  records cpu time, wall time, peak RSS, and optional stack samples under
-  `.meter/`.
-- `meter profile` folds embedded/source-aware profiling data, such as phase
-  breakdowns emitted by code that uses meter APIs.
-- `arena` compares collected benchmark results across targets.
-- `guard` turns static and runtime security evidence into one posture report.
+- `.github/workflows/gke-acceptance.yml` calls the test-image workflows that
+  moved into the keep, defer, relay and loom repositories, and
+  `acceptance/gke-harness/scripts/run-app.sh` copies `apps/<app>/k8s`; the
+  harness needs to check out those repositories first.
+- `scripts/agents/render_fleet.py` renders the whole fleet into this tree; the
+  `<app>-*` roles it writes belong to the app repositories.
+- `CONTRIBUTING.md` still describes the monorepo layout (`apps/<app>/…`).
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the repo-wide authoring contract:
-how to shape files, paths, and names so the tree stays legible to agents and
-tooling, plus the shared **service archetype** (a common service baseline with
-StatefulSet and Deployment workload profiles, HTTP/2 + OpenAPI, k8s-native)
-and the **CLI convention** every
-binary follows (`llm` / `upgrade` / `issue`).
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the authoring contract shared by
+every repository: how to shape files, paths, and names so the tree stays
+legible to agents and tooling, the shared **service archetype**, and the
+**CLI convention** every binary follows (`llm` / `upgrade` / `issue`).
 
 ## License
 

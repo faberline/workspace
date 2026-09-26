@@ -1,9 +1,9 @@
 ---
 project:
-  name: axiom
-  owner: chrischeng-c4
-  url: https://github.com/chrischeng-c4/axiom
-  ssh: git@github.com:chrischeng-c4/axiom.git
+  name: workspace
+  owner: faberline
+  url: https://github.com/faberline/workspace
+  ssh: git@github.com:faberline/workspace.git
   default_branch: main
 ---
 
@@ -132,6 +132,6 @@ promote, publish, or close work automatically. A worker report or partial gate
 is not final acceptance. The controller accepts only after independent,
 necessary verification.
 
-`aw` is the Python Typer CLI at `apps/aw`, invoked as
-`uv run --project apps/aw aw <group> …`. Its stdout and exit-code protocol is
+`aw` is the Python Typer CLI from `faberline/aw`, installed as a uv tool and invoked as
+`aw <group> …`. Its stdout and exit-code protocol is
 preserved for explicit legacy use.

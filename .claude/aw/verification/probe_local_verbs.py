@@ -61,9 +61,9 @@ target.unlink()
 
 # --- id parsing ------------------------------------------------------------
 f = load_epic_module().issue_number_from_create_output
-check(f("https://github.com/chrischeng-c4/axiom/issues/3601\n") == "3601", "URL -> id")
-check(f("Creating issue in chrischeng-c4/axiom\n\n"
-        "https://github.com/chrischeng-c4/axiom/issues/42") == "42",
+check(f("https://github.com/faberline/axiom/issues/3601\n") == "3601", "URL -> id")
+check(f("Creating issue in faberline/workspace\n\n"
+        "https://github.com/faberline/axiom/issues/42") == "42",
       "multi-line gh output still yields the id")
 check(f("something went sideways") is None, "input with no number returns None")
 
