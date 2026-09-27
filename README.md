@@ -34,7 +34,9 @@ repository, and the monorepo is archived.
 | [relay](https://github.com/faberline/relay) | `relay` is the online single-cast pull work-queue broker (RabbitMQ/SQS-shaped). |
 | [rig](https://github.com/faberline/rig) | Declarative test-scenario and load harness engine. |
 | [sift](https://github.com/faberline/sift) | Sift is the GCP/GKE-first operational event platform. |
+| [som](https://github.com/faberline/som) | The Snippet-Oriented Model: the `som-core` engine and CLI and the `som-code-python` corpus. |
 | [tape](https://github.com/faberline/tape) | Tape is the topic replay journal in the service stack. |
+| [truce](https://github.com/faberline/truce) | Forward-only PostgreSQL schema evolution control plane; planned, holding its backlog only. |
 | [vat](https://github.com/faberline/vat) | `vat` is a headless local development test runner for coding/ML agents. |
 | [workbench](https://github.com/faberline/workbench) | Terminal-first desktop workbench that launches Claude Code, Codex, or AGY through their native CLIs in a real PTY. |
 
