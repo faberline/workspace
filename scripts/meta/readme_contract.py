@@ -31,7 +31,7 @@ REQUIRED_H2 = (
 CAPABILITY_HEADER = ("Capability", "ID", "User promise", "Sources")
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SOURCE_RE = re.compile(
-    r"`((?:apps|libs|core)/[a-z0-9][a-z0-9-]*|external:[a-z0-9][a-z0-9-]*)`"
+    r"`((?:apps|libs|core|models)/[a-z0-9][a-z0-9-]*|external:[a-z0-9][a-z0-9-]*)`"
 )
 # `core/<crate>` names a faberline/core package that Cargo.lock resolves by git.
 CORE_SOURCE = "git+https://github.com/faberline/core?"
@@ -645,7 +645,7 @@ def validate_readme(
                                     f"source {source!r} must state its direct contribution",
                                 )
                             )
-                        if source.startswith(("apps/", "libs/")) and not (repo / source).exists():
+                        if source.startswith(("apps/", "libs/", "models/")) and not (repo / source).exists():
                             findings.append(
                                 Finding(
                                     "R7",
