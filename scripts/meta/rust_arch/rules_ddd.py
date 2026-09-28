@@ -10,7 +10,7 @@ from .rustsrc import Segs
 
 # Comments (//!, ///) and attributes on these items are not items, so they always pass.
 LIB_ALLOWED = frozenset({"mod", "use", "pub use", "#[cfg(test)] mod", "#![..]", "extern crate"})
-BIN_ALLOWED = frozenset({"mod", "use", "pub use", "#![..]", "extern crate", "fn main"})
+BIN_ALLOWED = frozenset({"mod", "use", "pub use", "#[cfg(test)] mod", "#![..]", "extern crate", "fn main"})
 LIB_WHAT = "只能有 mod、use、pub use、#[cfg(test)] mod、#![..]"
 
 
@@ -23,20 +23,17 @@ def _items(index: Index, path: str, allowed: frozenset[str], rule: str, what: st
 
 
 def check_roots(index: Index, out: Findings) -> None:
-    """B5 on every lib.rs, B6 on every main.rs and src/bin entry."""
-    bin_what = "main.rs／bin 只能有 use、mod 宣告和 fn main"
+    """B5 on every lib.rs, B6 on every binary entry file.
+
+    The entries are src/main.rs, src/bin/<name>.rs, and src/bin/<name>/main.rs.
+    Other modules under src/bin/<name>/ belong to that binary and are not B6.
+    """
+    bin_what = "main.rs／bin 只能有 use、mod 宣告、#[cfg(test)] mod 和 fn main"
     for pkg in index.cargo.packages.values():
         if pkg.lib:
             _items(index, pkg.lib, LIB_ALLOWED, "B5", f"lib.rs {LIB_WHAT}", out, warn=True)
         for path in pkg.bins:
             _items(index, path, BIN_ALLOWED, "B6", bin_what, out)
-        bin_dir = f"{pkg.src_dir}/bin/"
-        for path in index.files:
-            if path.startswith(bin_dir):
-                tail = path[len(bin_dir):].split("/")
-                if len(tail) >= 2 and tail[1:] != ["main.rs"]:
-                    out.error("B6", path, None, "src/bin/<name>/",
-                              f"`{bin_dir}{tail[0]}/` 只能放 main.rs")
 
 
 def check_undeclared(index: Index, out: Findings) -> None:

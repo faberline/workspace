@@ -46,7 +46,9 @@ test_data_dirs = ["fixtures", "compile_fail", "ui"]
 one_context_per_crate = false
 
 # Layers each layer may use inside one context. The shared kernel is usable by
-# every layer; assembly code (lib.rs, main.rs, src/bin) is unrestricted.
+# every layer; assembly code (lib.rs, main.rs, src/bin) is unrestricted. A
+# multi-file binary is src/bin/<name>/main.rs plus sibling modules: B6 keeps
+# the entry file thin and does not apply to those modules.
 [policy.layer_deps]
 domain = []
 application = ["domain"]

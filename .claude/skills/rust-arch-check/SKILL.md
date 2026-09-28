@@ -42,6 +42,10 @@ scripts/meta/rust_arch_contract.py scaffold --repo lumen          # print a draf
      root `.md` whitelist, and the docs skeleton.
    - **B**: context coverage, domain purity, layer direction, cross-context
      access, thin `lib.rs` (B5, a warning), and thin binaries (B6, an error).
+     B6 reads only the entry files: `src/main.rs`, `src/bin/<name>.rs`, and
+     `src/bin/<name>/main.rs`. An entry holds `use`, `mod`, `#[cfg(test)] mod`,
+     and `fn main`. Other modules beside `src/bin/<name>/main.rs` belong to
+     that binary and are not B6.
    - **C**: files over `size_warn` or `size_error`, and `[[large_files]]`
      allowlists.
    - **R**: the ratchet against the merge-base `ddd.toml`.

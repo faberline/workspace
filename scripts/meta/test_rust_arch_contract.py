@@ -350,6 +350,24 @@ class DomainRulesTest(Fixture):
                          {("B5", "warning", "fn helper"), ("B5", "warning", "inline mod")})
         self.assertEqual((code, repo["status"]), (0, "pass"))
 
+    def test_b6_multi_file_binary(self) -> None:
+        files = module_form()
+        files["crates/demo-cli/Cargo.toml"] = member("demo-cli")
+        files["crates/demo-cli/src/bin/tool/main.rs"] = "mod args;\n\nfn main() {\n    args::parse();\n}\n"
+        files["crates/demo-cli/src/bin/tool/args.rs"] = "pub struct Args;\n\npub fn parse() -> Args {\n    Args\n}\n"
+        files["ddd.toml"] += '\n[assembly]\ncrates = ["demo-cli"]\n'
+        self.assertClean(files)
+
+    def test_b6_entry_allows_cfg_test_mod(self) -> None:
+        files = module_form()
+        files["crates/demo-cli/Cargo.toml"] = member("demo-cli")
+        files["crates/demo-cli/src/main.rs"] = (
+            "mod cli;\n\nfn main() {}\n\n#[cfg(test)]\nmod tests {\n    #[test]\n    fn parses() {}\n}\n"
+        )
+        files["crates/demo-cli/src/cli.rs"] = "pub fn run() {}\n"
+        files["ddd.toml"] += '\n[assembly]\ncrates = ["demo-cli"]\n'
+        self.assertClean(files)
+
     def test_b5_b6_roots_and_binaries(self) -> None:
         files = module_form()
         files["crates/demo-billing/src/lib.rs"] += "fn helper() {}\n"
@@ -361,7 +379,7 @@ class DomainRulesTest(Fixture):
         found = self.found(self.check(files)[1])
         self.assertIn(("B5", "fn helper"), found)
         self.assertIn(("B6", "struct_item"), found)
-        self.assertIn(("B6", "src/bin/<name>/"), found)
+        self.assertNotIn(("B6", "src/bin/<name>/"), found)
         self.assertNotIn(("B1", "demo-cli"), found)
 
 
