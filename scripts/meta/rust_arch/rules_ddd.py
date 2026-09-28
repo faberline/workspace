@@ -8,23 +8,26 @@ from .model import Findings
 from .modtree import CrateRole, Index, in_root
 from .rustsrc import Segs
 
-LIB_ALLOWED = frozenset({"mod", "pub use", "#![..]", "extern crate"})
+# Comments (//!, ///) and attributes on these items are not items, so they always pass.
+LIB_ALLOWED = frozenset({"mod", "use", "pub use", "#[cfg(test)] mod", "#![..]", "extern crate"})
 BIN_ALLOWED = frozenset({"mod", "use", "pub use", "#![..]", "extern crate", "fn main"})
+LIB_WHAT = "只能有 mod、use、pub use、#[cfg(test)] mod、#![..]"
 
 
-def _items(index: Index, path: str, allowed: frozenset[str], rule: str, what: str, out: Findings) -> None:
+def _items(index: Index, path: str, allowed: frozenset[str], rule: str, what: str, out: Findings,
+           warn: bool = False) -> None:
+    emit = out.warn if warn else out.error
     for item in index.facts(path).items:
         if item.kind not in allowed:
-            out.error(rule, path, item.line, item.kind, f"{what}，不能有 `{item.kind}`")
+            emit(rule, path, item.line, item.kind, f"{what}，不能有 `{item.kind}`")
 
 
 def check_roots(index: Index, out: Findings) -> None:
     """B5 on every lib.rs, B6 on every main.rs and src/bin entry."""
-    lib_what = "lib.rs 只能有 mod 宣告、pub use、#![..]"
     bin_what = "main.rs／bin 只能有 use、mod 宣告和 fn main"
     for pkg in index.cargo.packages.values():
         if pkg.lib:
-            _items(index, pkg.lib, LIB_ALLOWED, "B5", lib_what, out)
+            _items(index, pkg.lib, LIB_ALLOWED, "B5", f"lib.rs {LIB_WHAT}", out, warn=True)
         for path in pkg.bins:
             _items(index, path, BIN_ALLOWED, "B6", bin_what, out)
         bin_dir = f"{pkg.src_dir}/bin/"
@@ -76,7 +79,7 @@ class _Layout:
                 self.out.error("B1", pkg.manifest_path, None, pkg.name,
                                f"crate `{pkg.name}` 沒有歸屬：不屬於任何 context、shared kernel 或 assembly")
                 continue
-            if role.kind == "multi":
+            if role.kind == "multi" and self.policy["one_context_per_crate"]:
                 names = "、".join(sorted(role.contexts))
                 self.out.error("B1", pkg.manifest_path, None, pkg.name,
                                f"crate `{pkg.name}` 橫跨多個 context（{names}）；一個 crate 只能屬於一個 context")
@@ -100,8 +103,7 @@ class _Layout:
             scope = self.index.facts(container).scopes[()]
             tests = {name for name, decl in scope.mods.items() if decl.cfg_test}
             if module:
-                _items(self.index, container, LIB_ALLOWED, "B5",
-                       "context 根檔只能有 mod 宣告、pub use、#![..]", self.out)
+                _items(self.index, container, LIB_ALLOWED, "B5", f"context 根檔{LIB_WHAT}", self.out, warn=True)
         for name, file in self.index.children(pkg, module).items():
             child = f"{base}/{name}" if base else name
             if child in declared:

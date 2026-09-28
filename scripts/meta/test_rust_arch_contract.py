@@ -15,12 +15,13 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from rust_arch import cli
 from rust_arch.files import count_lines
-from rust_arch.model import POLICY_PATH
+from rust_arch.model import POLICY_PATH, load_policy
 
 POLICY = POLICY_PATH.read_text(encoding="utf-8")
 POLICY = POLICY[POLICY.index("\n[policy]") + 1:]
@@ -201,6 +202,22 @@ class LayoutRulesTest(Fixture):
         self.assertIn(("A1", "crates/demo-orders/tests/it/"), rules)
         self.assertIn(("A1", "e2e/"), rules)
 
+    def test_a1_standalone_test_exceptions(self) -> None:
+        files = module_form()
+        billing = "crates/demo-billing/tests"
+        files["crates/demo-shared-kernel/tests/only.rs"] = "#[test]\nfn only() {}\n"
+        files["crates/demo-shared-kernel/tests/fixtures/case.rs"] = "fn main() {}\n"
+        files[f"{billing}/it/main.rs"] = "mod smoke;\n"
+        files[f"{billing}/it/smoke.rs"] = "#[test]\nfn smoke() {}\n"
+        files[f"{billing}/alloc.rs"] = "//! Counts allocations.\n//!\n//! isolation: installs a #[global_allocator]\n\n#[test]\nfn a() {}\n"
+        files[f"{billing}/blank.rs"] = "//! isolation:\n#[test]\nfn b() {}\n"
+        files[f"{billing}/late.rs"] = "#[test]\nfn c() {}\n//! isolation: too late\n"
+        files[f"{billing}/common/mod.rs"] = "pub fn helper() {}\n"
+        repo = self.check(files)[1]
+        flagged = {f["path"]: f["message"] for f in repo["findings"] if f["rule"] == "A1"}
+        self.assertEqual(set(flagged), {f"{billing}/blank.rs", f"{billing}/late.rs", f"{billing}/common/"})
+        self.assertIn("沒有寫理由", flagged[f"{billing}/blank.rs"])
+
     def test_a2_single_crate_workspace_wrapper(self) -> None:
         files = single_crate()
         files["Cargo.toml"] += '\n[workspace]\nmembers = ["."]\n'
@@ -219,10 +236,12 @@ class LayoutRulesTest(Fixture):
         files = module_form()
         files["Cargo.toml"] = files["Cargo.toml"].replace('mod_module_files = "deny"', 'mod_module_files = "warn"')
         files["NOTES.md"] = "notes\n"
+        files[".loop-prompt.md"] = "hidden\n"
         del files["docs/glossary.md"]
         found = self.found(self.check(files)[1])
         self.assertIn(("A3", "clippy::mod_module_files"), found)
         self.assertIn(("A4", "NOTES.md"), found)
+        self.assertNotIn(("A4", ".loop-prompt.md"), found)
         self.assertIn(("A5", "docs/glossary.md"), found)
 
 
@@ -243,14 +262,16 @@ class DomainRulesTest(Fixture):
 
     def test_b2_domain_purity(self) -> None:
         files = module_form()
-        files["crates/demo-billing/Cargo.toml"] += 'tokio = "1"\n'
+        files["crates/demo-billing/Cargo.toml"] += 'tokio = "1"\nuuid = "1"\n'
         files[self.DOMAIN] += (
             "use tokio::sync::Mutex;\n\npub fn load() -> Vec<u8> {\n    std::fs::read(\"x\").unwrap()\n}\n\n"
+            "pub fn mint() -> uuid::Uuid {\n    uuid::Uuid::new_v4()\n}\n\n"
             "pub fn log() {\n    println!(\"x\");\n}\n\n#[cfg(test)]\nmod tests {\n    use std::process::Command;\n}\n"
         )
         code, repo = self.check(files)
         found = self.found(repo)
-        self.assertTrue({("B2", "tokio"), ("B2", "std::fs"), ("B2", "println!")} <= found, found)
+        wanted = {("B2", "tokio"), ("B2", "std::fs"), ("B2", "println!"), ("B2", "uuid::Uuid::new_v4")}
+        self.assertTrue(wanted <= found, found)
         self.assertNotIn(("B2", "std::process"), found)
         self.assertEqual((code, repo["status"]), (1, "fail"))
 
@@ -297,6 +318,37 @@ class DomainRulesTest(Fixture):
         files = {k.replace("demo-billing-domain", "billing-core"): v.replace("demo-billing-domain", "billing-core")
                  .replace("demo_billing_domain", "billing_core") for k, v in crate_form().items()}
         self.assertIn(("B1", "billing-core"), self.found(self.check(files)[1]))
+
+    def test_b1_several_contexts_in_one_crate(self) -> None:
+        files = module_form()
+        files["crates/demo-billing/src/lib.rs"] += "pub mod audit;\n"
+        files["crates/demo-billing/src/audit.rs"] = "pub mod domain;\n"
+        files["crates/demo-billing/src/audit/domain.rs"] = "pub struct Entry;\n"
+        files["ddd.toml"] += context("audit", "", {"domain": "crates/demo-billing/src/audit/domain"})
+        self.assertClean(files)
+        strict = {**load_policy(), "one_context_per_crate": True}
+        files["ddd.toml"] = files["ddd.toml"].replace("one_context_per_crate = false", "one_context_per_crate = true")
+        with mock.patch.object(cli, "load_policy", return_value=strict):
+            code, repo = self.check(files)
+        self.assertIn(("B1", "demo-billing"), self.found(repo))
+        self.assertEqual(code, 1)
+
+    def test_b5_thin_lib_allows_declarations(self) -> None:
+        files = module_form()
+        files["crates/demo-billing/src/lib.rs"] = (
+            "//! Billing context.\n#![forbid(unsafe_code)]\n\nuse std::fmt;\n\n/// Layers.\n"
+            + "".join(f"#[allow(missing_docs)]\npub mod {layer};\n" for layer in LAYERS)
+            + "pub use application::Invoicer;\n\n#[cfg(test)]\nmod tests {\n    #[test]\n    fn t() {}\n}\n"
+        )
+        self.assertClean(files)
+
+    def test_b5_is_a_warning_and_b6_an_error(self) -> None:
+        files = module_form()
+        files["crates/demo-billing/src/lib.rs"] += "fn helper() {}\n\nmod inline {}\n"
+        code, repo = self.check(files)
+        self.assertEqual({(f["rule"], f["severity"], f["subject"]) for f in repo["findings"]},
+                         {("B5", "warning", "fn helper"), ("B5", "warning", "inline mod")})
+        self.assertEqual((code, repo["status"]), (0, "pass"))
 
     def test_b5_b6_roots_and_binaries(self) -> None:
         files = module_form()

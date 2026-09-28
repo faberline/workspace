@@ -35,8 +35,15 @@ domain_layer = "domain"
 public_layers = ["application"]
 # <ctx>/domain/events(.rs|/) is the only domain module other contexts may use.
 domain_events = "events"
-# A tests/<name>.rs binary is allowed only when it needs process isolation.
+# A tests/<name>.rs binary may stand alone only when it is the crate's single test
+# target, contains one of these markers, or its leading //! block carries
+# `//! isolation: <reason>`. Everything else lives in tests/it/.
 test_isolation_markers = ["set_var(", "remove_var(", "#[global_allocator]"]
+# tests/<dir>/ names holding .rs data (fixtures, trybuild cases), not test targets.
+test_data_dirs = ["fixtures", "compile_fail", "ui"]
+# false: one crate may hold several contexts (B3/B4 still guard each boundary).
+# true: B1 requires every crate to belong to exactly one context.
+one_context_per_crate = false
 
 # Layers each layer may use inside one context. The shared kernel is usable by
 # every layer; assembly code (lib.rs, main.rs, src/bin) is unrestricted.
@@ -84,6 +91,7 @@ denied_paths = [
   "time::OffsetDateTime::now_local",
   "time::Instant::now",
   "uuid::Uuid::now_v7",
+  "uuid::Uuid::new_v4",
 ]
 denied_macros = ["println", "print", "eprintln", "eprint", "dbg"]
 shared_kernel_pure = true

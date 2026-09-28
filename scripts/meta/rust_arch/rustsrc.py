@@ -351,6 +351,8 @@ def parse(src: bytes) -> SourceFacts:
     items = []
     for child in root.named_children:
         kind = _item_kind(src, child)
+        if kind == "inline mod" and spans.in_test(child.start_byte):
+            kind = "#[cfg(test)] mod"
         if kind is not None:
             items.append(Item(kind, _line(child)))
     return SourceFacts(scopes, refs, macros, items, path_attr_lines)

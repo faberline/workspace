@@ -41,7 +41,7 @@ scripts/meta/rust_arch_contract.py scaffold --repo lumen          # print a draf
    - **A**: tests layout, Cargo shape (D2), the `mod_module_files` lint, the
      root `.md` whitelist, and the docs skeleton.
    - **B**: context coverage, domain purity, layer direction, cross-context
-     access, thin `lib.rs`, and thin binaries.
+     access, thin `lib.rs` (B5, a warning), and thin binaries (B6, an error).
    - **C**: files over `size_warn` or `size_error`, and `[[large_files]]`
      allowlists.
    - **R**: the ratchet against the merge-base `ddd.toml`.
@@ -51,6 +51,20 @@ scripts/meta/rust_arch_contract.py scaffold --repo lumen          # print a draf
 5. To onboard a repo, pipe `scaffold` output to the user as a draft. The
    draft starts with `enforce = false`. Every `TODO` reason must be replaced
    by a real one before the draft is committed.
+6. To clear A1, move integration tests into `tests/it/`, which is compiled
+   as one binary from `tests/it/main.rs`.
+   - A `tests/<name>.rs` file may stay standalone in three cases. It is the
+     crate's only test file. Or it contains a `test_isolation_markers` entry.
+     Or its leading `//!` block has a `//! isolation: <reason>` line with a
+     non-empty reason.
+   - `.rs` files under a `tests/<dir>/` named in `test_data_dirs` are data,
+     not tests.
+   - proptest keeps failure seeds next to the directory that holds the test
+     binary's `main.rs`. After the move, seeds for `tests/it/<module>.rs` go
+     to `tests/proptest-regressions/<module>.txt`. The old sibling
+     `tests/<name>.proptest-regressions` files are no longer replayed, so
+     move each one to `tests/proptest-regressions/<module>.txt` in the same
+     change.
 
 ## Acceptance
 
