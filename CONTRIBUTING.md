@@ -1146,7 +1146,7 @@ hides every other service's failure.
 ## Conformance: what proves a service actually complies
 
 Every rule above is a claim until something fails on it. Three mechanisms
-do the failing: the `e2e/` suite for externally observable behavior, EC gates
+do the failing: the `tests/it/` suite for externally observable behavior, EC gates
 for evidence-backed behavior, and the dogfood rules for the surfaces a test
 suite never exercises. Architecture and profile shape is the fourth question,
 and nothing runs it any more — the catalogue below is a hand-applied checklist,
