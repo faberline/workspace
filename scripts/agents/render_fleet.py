@@ -37,7 +37,7 @@ from typing import Dict, Iterable, List, Tuple
 
 APPS: Tuple[str, ...] = (
     "arena", "aw", "beam", "cap", "cgdb", "courier", "cube", "defer", "guard",
-    "jet", "keep", "loom", "mamba", "mesh", "meter", "pgpool", "pm",
+    "jet", "keep", "loom", "mamba", "mesh", "meter", "pgpool",
     "preview", "relay", "sift", "tape", "vat", "workbench",
 )
 # The shared libraries moved to faberline/core, so no lib-tier project

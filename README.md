@@ -29,7 +29,6 @@ repository, and the monorepo is archived.
 | [mesh](https://github.com/faberline/mesh) | Mesh is the relationship/property-graph service in the service stack. |
 | [meter](https://github.com/faberline/meter) | Local resource measurement for agent-driven Rust development. |
 | [pgpool](https://github.com/faberline/pgpool) | Kubernetes-native PostgreSQL connection pooler. |
-| [pm](https://github.com/faberline/pm) | Local, agent-first project management MCP server. |
 | [preview](https://github.com/faberline/preview) | `preview` manages MR-scoped UAT preview environments for GKE. |
 | [relay](https://github.com/faberline/relay) | `relay` is the online single-cast pull work-queue broker (RabbitMQ/SQS-shaped). |
 | [rig](https://github.com/faberline/rig) | Declarative test-scenario and load harness engine. |
