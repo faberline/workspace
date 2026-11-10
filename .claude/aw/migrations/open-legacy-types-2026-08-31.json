@@ -1988,7 +1988,7 @@
       "source_type": "change",
       "target_type": "fix",
       "reason": "Repairs an existing defect or an unmet current product promise.",
-      "evidence": "Body judgment: Normal minified scope-hoisted builds unconditionally write an intermediate bundle to /Users/chrischeng/projects/tw-monitor/after_interop_1.js. This can overwrite an unrelated checkout, leak source outside the requeste... Milestone: #59 epic(jet): build artifact and diagnostic containment. Product promise: matching current public surface apps/jet/README.md#bundler-and-production-build; body records a defect.",
+      "evidence": "Body judgment: Normal minified scope-hoisted builds unconditionally write an intermediate bundle to <home>/projects/<other-checkout>/after_interop_1.js. This can overwrite an unrelated checkout, leak source outside the requeste... Milestone: #59 epic(jet): build artifact and diagnostic containment. Product promise: matching current public surface apps/jet/README.md#bundler-and-production-build; body records a defect.",
       "expected_labels_sha256": "a8484bdd8bcbb7771e4c63724e7105651cd0cd7835b8e99ff84ebeeb7ff45e67",
       "updatedAt": "2026-08-30T12:28:58Z",
       "milestone_number": 59,
